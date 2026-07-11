@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L'Héritage du Sang - Accueil</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Crimson+Text&display=swap" rel="stylesheet">
+    <!-- On chargera le CSS externe ici -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="bg-accueil"></div>
+    <div class="bg-overlay"></div>
+
+    <!-- LE PARCHEMIN (MODALE) -->
+    <div id="custom-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div id="modal-text"></div>
+            <div id="modal-input-area">
+                <input type="text" id="modal-input-field">
+            </div>
+            <button id="modal-btn" class="btn-modal">Continuer</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header-titles">
+            <h1>L'HÉRITAGE DU SANG</h1>
+            <div class="subtitle">L'ÉNIGME DE L'OUBLIETTE</div>
+        </div>
+
+        <div class="auth-card">
+            <h2 id="form-title">CRÉER UN COMPTE</h2>
+            <div class="input-group" id="group-pseudo">
+                <label>Pseudo de jeu</label>
+                <input type="text" id="pseudo" placeholder="Ex: ChevalierNoir">
+            </div>
+            <div class="input-group">
+                <label>Adresse Mail</label>
+                <input type="email" id="email" placeholder="votre@email.com">
+            </div>
+            <div class="input-group">
+                <label>Mot de passe</label>
+                <input type="password" id="password" placeholder="********">
+            </div>
+            <button class="btn-main" id="submit-auth">COMMENCER L'AVENTURE</button>
+            <div class="toggle-auth" id="toggle-link">Déjà inscrit ? Se connecter</div>
+            <div class="toggle-auth" id="forgot-password" style="display:none; margin-top: 10px; font-size: 0.75rem; opacity: 0.8;">Mot de passe oublié ?</div>
+        </div>
+        
+        <div class="credits">© 2026 - Imaginé et créé par Bruno CULOT</div>
+    </div>
+
+    <script type="module" src="js/auth.js"></script>
+</body>
+</html>

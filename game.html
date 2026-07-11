@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L'Héritage du Sang - Donjon</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Crimson+Text:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        :root {
+            --gold: #d4af37;
+            --blood: #8b0000;
+            --panel: rgba(10, 10, 10, 0.4);
+            --text: #e0d5c0;
+        }
+
+        body, html {
+            margin: 0; padding: 0; height: 100%;
+            background-color: #000; color: var(--text);
+            font-family: 'Crimson Text', serif;
+            overflow: hidden;
+        }
+
+        #scene-container {
+            position: relative;
+            width: 100vw; height: 100vh;
+            background-size: cover;
+            background-position: center;
+            transition: background-image 1s ease-in-out;
+            display: flex; flex-direction: column; justify-content: flex-end;
+        }
+
+        /* BARRE SUPÉRIEURE */
+        #top-bar {
+            position: absolute; top: 0; width: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+            padding: 10px 25px; display: flex; justify-content: space-between; align-items: center;
+            box-sizing: border-box; z-index: 100;
+        }
+        #player-name { font-family: 'Cinzel', serif; color: var(--gold); letter-spacing: 2px; font-size: 1.1rem; }
+
+        /* ZONE D'INTERFACE BASSE */
+        #ui-panel {
+            background: var(--panel);
+            border-top: 2px solid var(--gold);
+            padding: 20px 40px;
+            min-height: 150px;
+            box-shadow: 0 -15px 40px rgba(0,0,0,0.8);
+            z-index: 10;
+            text-align: center;
+            
+            /* AJOUTE CES DEUX LIGNES ICI */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        
+        #description-text {
+            font-size: 1.3rem;
+            line-height: 1.4;
+            margin-bottom: 20px;
+            max-width: 1000px;
+            margin-left: auto; margin-right: auto;
+            font-style: italic;
+        }
+
+        #choices-grid {
+            display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;
+        }
+
+        .btn-game {
+            background: rgba(42, 29, 21, 0.8);
+            color: var(--gold);
+            border: 1px solid var(--gold);
+            padding: 10px 25px;
+            font-family: 'Cinzel', serif;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+        }
+
+        .btn-game:hover {
+            background: var(--blood);
+            color: white;
+            box-shadow: 0 0 15px var(--blood);
+        }
+
+        #inventory-panel {
+            margin-top: 15px; padding-top: 10px;
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+            font-size: 0.85rem; color: var(--gold);
+            font-family: 'Cinzel', serif;
+            opacity: 0.7;
+        }
+
+        /* MODALE D'OBJET (LOOT) */
+        .item-modal-content {
+            background: linear-gradient(145deg, #1a1a1a, #000);
+            border: 3px solid var(--gold);
+            width: 90%; max-width: 800px;
+            display: flex; flex-direction: row;
+            padding: 0; overflow: hidden;
+            box-shadow: 0 0 100px rgba(212, 175, 55, 0.3);
+            animation: modalFadeIn 0.5s ease-out;
+        }
+
+        .item-modal-left {
+            flex: 1; background: rgba(255,255,255,0.03);
+            display: flex; align-items: center; justify-content: center;
+            padding: 40px; border-right: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .item-modal-left img {
+            max-width: 100%;
+            filter: drop-shadow(0 0 20px var(--gold));
+            animation: itemFloat 3s ease-in-out infinite;
+        }
+
+        .item-modal-right {
+            flex: 1.5; padding: 40px;
+            display: flex; flex-direction: column; justify-content: center; text-align: left;
+        }
+
+        #item-modal-title {
+            font-family: 'Cinzel', serif; color: var(--gold);
+            margin-top: 0; font-size: 2rem; letter-spacing: 4px;
+        }
+
+        #item-modal-text {
+            font-size: 1.2rem; line-height: 1.6;
+            margin-bottom: 30px; color: #fff;
+        }
+
+        @keyframes itemFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* RESPONSIVE SMARTPHONE */
+        @media (max-width: 768px) {
+            #ui-panel { padding: 25px 15px; }
+            #description-text { font-size: 1.1rem; }
+            .btn-game { width: 100%; padding: 15px; }
+            .item-modal-content { flex-direction: column; }
+            .item-modal-left { padding: 20px; }
+            .item-modal-right { padding: 30px; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="rotate-device">
+        <div class="rotate-content">
+            <img src="assets/images/rotate-icon.png" alt="Rotate">
+            <p>L'Héritage du Sang nécessite le mode paysage pour une immersion totale.</p>
+            <p>Merci de faire pivoter votre appareil.</p>
+        </div>
+    </div>
+
+    <!-- MODALE PARCHEMIN (Messages et Questions) -->
+    <div id="custom-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div id="modal-text"></div>
+            <div id="modal-input-area" style="display:none; margin-top:20px;">
+                <input type="text" id="modal-input-field" style="color: black; border: 1px solid #3d2b1f; padding: 10px; width: 80%;">
+            </div>
+            <button id="modal-btn" class="btn-modal">Continuer</button>
+        </div>
+    </div>
+
+    <!-- MODALE OBJET (Loot et Récompenses) -->
+    <div id="item-modal" class="modal-overlay" style="display:none;">
+        <div class="item-modal-content">
+            <div class="item-modal-left">
+                <img id="item-modal-img" src="" alt="Objet">
+            </div>
+            <div class="item-modal-right">
+                <h2 id="item-modal-title">OBJET TROUVÉ</h2>
+                <div id="item-modal-text"></div>
+                <button id="item-modal-btn" class="btn-game">POURSUIVRE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTENEUR PRINCIPAL DU JEU -->
+    <div id="scene-container">
+        <div id="top-bar">
+            <div id="player-name">Chargement...</div>
+            <button class="btn-game" onclick="logout()" style="padding: 8px 15px; font-size: 0.8rem;">Quitter</button>
+        </div>
+
+        <div id="ui-panel">
+            <div id="description-text">L'obscurité vous enveloppe...</div>
+            <div id="choices-grid"></div>
+            <div id="inventory-panel">BESACE : <span id="inventory-list">Vide</span></div>
+        </div>
+    </div>
+
+    <!-- MODALE HALL OF FAME (Grand Parchemin) -->
+    <div id="hall-modal" class="modal-overlay" style="display:none;">
+        <div class="modal-content" style="height: 600px; max-width: 500px; padding: 60px 80px;">
+            <h2 style="font-family: 'Cinzel', serif; color: #3d2b1f; margin-bottom: 10px;">LES ÉVADÉS</h2>
+            <div id="hall-list" style="overflow-y: auto; max-height: 350px; width: 100%; color: #3d2b1f; font-weight: bold; line-height: 2;">
+                <!-- Les pseudos s'afficheront ici -->
+            </div>
+            <button class="btn-modal" onclick="document.getElementById('hall-modal').style.display='none'">Fermer</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc, collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { firebaseConfig } from "./js/config.js";
+        import { UI } from "./js/ui.js";
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- EXTENSION DE L'UI POUR LES OBJETS ---
+        UI.showItem = function(title, text, imagePath, callback) {
+            const modal = document.getElementById('item-modal');
+            document.getElementById('item-modal-title').innerText = title;
+            document.getElementById('item-modal-text').innerText = text;
+            document.getElementById('item-modal-img').src = imagePath;
+            modal.style.display = 'flex';
+            document.getElementById('item-modal-btn').onclick = () => {
+                modal.style.display = 'none';
+                if (callback) callback();
+            };
+        };
+
+        let currentUser = null;
+        let userData = null;
+        let currentActiveScene = null; // Pour éviter les rechargements inutiles
+
+        // --- GESTION DES SONS AMÉLIORÉE ---
+        const sounds = {
+            // Actions (One-shot)
+            success: new Audio('assets/audio/success.mp3'),
+            error: new Audio('assets/audio/error.mp3'),
+            gouttes: new Audio('assets/audio/gouttes_eau.mp3'),
+            door: new Audio('assets/audio/grincement.mp3'),
+            herse: new Audio('assets/audio/herse.mp3'),
+            chaines: new Audio('assets/audio/chaines_sol.mp3'),
+            pierre: new Audio('assets/audio/pierre_glisse.mp3'),
+            verre: new Audio('assets/audio/cliquetis_verre.mp3'),
+            bubbles: new Audio('assets/audio/bulles_verre.mp3'),
+            vapeur: new Audio('assets/audio/alchimie_ambiance.mp3'),
+            spark: new Audio('assets/audio/cristal_spark.mp3'),
+            optique: new Audio('assets/audio/optique_ambiance.mp3'),
+            miroir: new Audio('assets/audio/miroir_clic.mp3'),            
+            rats: new Audio('assets/audio/rats_squeaks.mp3'),
+            feu: new Audio('assets/audio/feu_cheminee.mp3'),
+            herbo: new Audio('assets/audio/herbo_ambiance.mp3'),
+            coupe: new Audio('assets/audio/herbe_coupee.mp3'),
+            vent: new Audio('assets/audio/tour_vent.mp3'),
+            mecanisme: new Audio('assets/audio/mecanisme_lourd.mp3'),
+            tic_tac: new Audio('assets/audio/horloge_tic_tac.mp3'),
+            engrenage: new Audio('assets/audio/engrenage_clic.mp3'),
+            nuit: new Audio('assets/audio/nuit_remparts.mp3'),
+            sommeil: new Audio('assets/audio/pschitt_sommeil.mp3'),
+            espoir: new Audio('assets/audio/final_hope.mp3'),
+            ouverture: new Audio('assets/audio/pont_qui_tombe.mp3'),
+            vent_haut: new Audio('assets/audio/vent_sifflement.mp3'),
+            gaz: new Audio('assets/audio/vapeur_pschitt.mp3'),
+        };
+
+        // Réglage précis des volumes (0.0 à 1.0)
+        sounds.success.volume = 0.2;
+        sounds.error.volume = 0.5;
+        sounds.gouttes.volume = 0.3;
+        sounds.chaines.volume = 0.4;
+        sounds.rats.volume = 0.5; // Très bas pour ne pas agacer
+        sounds.feu.volume = 0.3;
+        sounds.door.volume = 0.4;
+        sounds.herse.volume = 0.5
+        sounds.verre.volume = 0.2;
+        sounds.bubbles.volume = 0.4;
+        sounds.vapeur.volume = 0.2;
+        sounds.spark.volume = 0.4;
+        sounds.optique.volume = 0.3;
+        sounds.miroir.volume = 0.5;
+        sounds.herbo.volume = 0.7;
+        sounds.coupe.volume = 0.5;
+        sounds.vent.volume = 0.4;
+        sounds.mecanisme.volume = 0.5;
+        sounds.tic_tac.volume = 0.3;
+        sounds.engrenage.volume = 0.4;
+        sounds.nuit.volume = 0.3;
+        sounds.sommeil.volume = 0.5;
+        sounds.espoir.volume = 0.1;
+        sounds.ouverture.volume = 0.2;
+        sounds.vent_haut.volume = 0.3;
+        sounds.gaz.volume = 0.7;
+
+        function playSound(name) {
+            if (sounds[name]) {
+                sounds[name].currentTime = 0;
+                sounds[name].play().catch(e => console.log("Audio bloqué par le navigateur"));
+            }
+        }
+
+        function stopAllAmbiance() {
+            const ambiances = [sounds.gouttes, sounds.rats, sounds.feu, sounds.bubbles, sounds.vapeur, sounds.optique, sounds.herbo, sounds.vent, sounds.tic_tac, sounds.vent_haut, sounds.nuit, sounds.espoir];
+            ambiances.forEach(s => {
+                s.pause();
+                s.loop = false; // On force l'arrêt de la boucle
+                s.currentTime = 0;
+            });
+        }
+
+        // --- DONNÉES DES SCÈNES ---
+        const scenes = {
+            "cellule": {
+                text: "Vous reprenez conscience dans une cellule glaciale. Vos mains sont enchaînées au mur. Une odeur de salpêtre sature l'air.",
+                image: "assets/images/scenes/bg_cellule_01.webp",
+                ambience: "gouttes",
+                choices: [
+                    { text: "Observer les murs", next: "mur_enigme" },
+                    { text: "Tirer sur les chaînes", action: () => UI.message("L'acier est trop solide !") }
+                ]
+            },
+            "mur_enigme": {
+                text: "Sur une pierre humide, une inscription est gravée : 'Je commence la nuit et je finis le matin, j'apparais deux fois dans l'année et une seule fois dans la journée. Qui suis-je ?'",
+                image: "assets/images/scenes/bg_mur_02.webp",
+                ambience: "gouttes",
+                choices: [
+                    { text: "Répondre à l'énigme", action: () => verifierEnigmeN() },
+                    { text: "Retourner au centre", next: "cellule" }
+                ]
+            },
+            "couloir_01": {
+                text: "Les chaînes sont tombées ! La porte de la cellule a pivoté. Vous débouchez dans un couloir sombre. Des rats bloquent le passage au loin.",
+                image: "assets/images/scenes/bg_cellule_01.webp", 
+                choices: [
+                    { text: "S'avancer vers les rats", next: "couloir_rats" }
+                ]
+            },
+            "couloir_rats": {
+                text: "Des dizaines de rats grincent des dents. Un mécanisme complexe est incrusté dans le mur humide.",
+                image: "assets/images/scenes/bg_couloir_03.webp",
+                ambience: "rats",
+                loop: false,
+                choices: [
+                    { text: "Examiner le mécanisme", next: "zoom_mecanisme" },
+                    { text: "Reculer", next: "couloir_01" }
+                ]
+            },
+            "zoom_mecanisme": {
+                text: "Le mécanisme attend un nombre précis. Une gravure indique : 'Seul le nombre parfait ouvrira la voie.'",
+                image: "assets/images/scenes/bg_mecanisme_rats.webp",
+                ambience: "rats",
+                loop: false,
+                choices: [
+                    { text: "Voir la gravure", action: () => enigmeMathRats() },
+                    { text: "S'éloigner", next: "couloir_rats" }
+                ]
+            },
+            "salle_des_gardes": {
+                text: "La trappe a aspiré les rats ! Vous arrivez dans la salle des gardes. Des armures vides semblent vous surveiller. Une lourde table en chêne trône au centre de la pièce.",
+                image: "assets/images/scenes/bg_salle_gardes.webp", 
+                choices: [
+                    { text: "S'approcher de la table", next: "table_gardes" },
+                    { text: "Fouiller les râteliers", action: () => UI.message("Les armes sont enchaînées au mur. Impossible de s'en saisir.") }
+                ]
+            },
+            "table_gardes": {
+                text: "Trois casques de cérémonie sont posés sur la table, devant une balance étrange. Une plaque de cuivre semble porter une inscription.",
+                image: "assets/images/scenes/bg_table_gardes.webp", 
+                choices: [
+                    { text: "Lire l'énigme", action: () => enigmeCasqueOr() },
+                    { text: "Revenir en arrière", next: "salle_des_gardes" }
+                ]
+            },
+            "grille_fer": {
+                text: "Une immense herse de fer bloque le passage. Un froid glacial provient de l'autre côté. À droite de la herse, une fente circulaire semble attendre un objet particulier.",
+                image: "assets/images/scenes/bg_grille_fer.webp", 
+                choices: [
+                    { text: "Insérer le Médaillon", action: () => utiliserMedaillon() },
+                    { text: "Revenir à la salle des gardes", next: "salle_des_gardes" }
+                ]
+            },
+            "antichambre": {
+                text: "L'air est ici plus lourd, chargé d'une odeur de poussière et d'ancien encens. Les Appartements Royaux s'ouvrent à vous. Une cheminée monumentale attire votre regard.",
+                image: "assets/images/scenes/bg_antichambre.webp", 
+                ambience: "feu",
+                choices: [
+                    { text: "Examiner la cheminée", next: "zoom_blason" },
+                    { text: "Fouiller les tapisseries", action: () => UI.message("Elles tombent en lambeaux sous vos doigts. Rien d'utile ici.") }
+                ]
+            },
+            "zoom_blason": {
+                text: "Le blason des fondateurs est gravé dans la pierre. Quatre animaux devaient y siéger, mais certaines gravures sont effacées, on devine encore la silhouette d'un canidé sur la partie supérieure droite.",
+                image: "assets/images/scenes/bg_zoom_blason.webp", 
+                ambience: "feu",
+                choices: [
+                    { text: "Déchiffrer l'énigme", action: () => enigmeBlasonLoup() },
+                    { text: "Revenir dans la pièce", next: "antichambre" }
+                ]
+            },
+            "bibliotheque": {
+                text: "La porte secrète pivotée, vous entrez dans une bibliothèque royale colossale. Des milliers de grimoires dorment ici. Une étagère semble avoir été manipulée récemment.",
+                image: "assets/images/scenes/bg_bibliotheque.webp", 
+                choices: [
+                    { text: "Examiner l'étagère", next: "zoom_livres" },
+                    { text: "Revenir à l'antichambre", next: "antichambre" }
+                ]
+            },
+            "zoom_livres": {
+                text: "Une suite de vieux livres porte des dates dorées : 1240, 1245, 1251, 1258... Un emplacement est vide, attendant le livre qui complètera la suite.",
+                image: "assets/images/scenes/bg_zoom_livres.webp", 
+                choices: [
+                    { text: "Placer le livre manquant", action: () => enigmeLivresDates() },
+                    { text: "S'éloigner", next: "bibliotheque" }
+                ]
+            },    
+            "cabinet_curiosites": {
+                text: "L'air sature de vapeurs d'éther. Des fioles colorées attendent sur un trépied. Un carnet de notes donne les instructions de dosage.",
+                image: "assets/images/scenes/bg_cabinet.webp",
+                ambience: "bubbles", 
+                choices: [
+                    { text: "Examiner les fioles", next: "zoom_cabinet" },
+                    { text: "Retourner à la bibliothèque", next: "bibliotheque" }
+                ]
+            },
+            "zoom_cabinet": {
+                text: "Trois fioles (Rouge: 10ml, Bleue: 22ml, Verte: 7ml) sont prêtes sur l'établi. Le carnet détaille le calcul précis à effectuer.",
+                image: "assets/images/scenes/bg_zoom_fioles.webp",
+                ambience: "bubbles", 
+                choices: [
+                    { text: "Voir le carnet", action: () => enigmeFiolesEther() },
+                    { text: "Reculer", next: "cabinet_curiosites" }
+                ]
+            },
+            "laboratoire_alchimie": {
+                text: "Des sifflements de vapeur s'échappent des tuyaux de cuivre. Au centre, un alambic monumental semble être le cœur de la pièce. Un établi sur le côté attire votre attention.",
+                image: "assets/images/scenes/bg_laboratoire.webp",
+                ambience: "vapeur",
+                choices: [
+                    { text: "Examiner l'établi", next: "zoom_alambic" },
+                    { text: "Retourner au cabinet", next: "cabinet_curiosites" }
+                ]
+            },
+            "zoom_alambic": {
+                text: "Une ardoise poussiéreuse indique une formule de transmutation inachevée. Vous devez déterminer la quantité exacte de Soufre nécessaire.",
+                image: "assets/images/scenes/bg_zoom_alambic.webp",
+                ambience: "vapeur",
+                choices: [
+                    { text: "Voir l'ardoise", action: () => enigmeAlchimieEquilibre() },
+                    { text: "S'éloigner", next: "laboratoire_alchimie" }
+                ]
+            },
+            "table_geometrie": {
+                text: "Une lumière pure traverse la pièce et vient frapper une table de pierre gravée. Un mécanisme de miroirs attend d'être ajusté pour diriger le faisceau.",
+                image: "assets/images/scenes/bg_geometrie.webp",
+                ambience: "optique",
+                loop: false,
+                choices: [
+                    { text: "Examiner les miroirs", next: "zoom_miroirs" },
+                    { text: "Revenir au laboratoire", next: "laboratoire_alchimie" }
+                ]
+            },
+            "zoom_miroirs": {
+                text: "Le socle des miroirs indique deux angles de 65°. Une inscription dit : 'Clôt le triangle pour voir la vérité'. Quel angle doit prendre le sommet ?",
+                image: "assets/images/scenes/bg_zoom_miroirs.webp",
+                ambience: "optique",
+                loop: false,
+                choices: [
+                    { text: "Régler l'angle", action: () => enigmeGeometrieAngles() },
+                    { text: "S'éloigner", next: "table_geometrie" }
+                ]
+            },
+            "herboristerie": {
+                text: "Une odeur apaisante de plantes séchées embaume la pièce. Sur une étagère, trois plantes singulières semblent attendre d'être préparées selon les instructions du grimoire.",
+                image: "assets/images/scenes/bg_herboristerie.webp",
+                ambience: "herbo",
+                choices: [
+                    { text: "Examiner les plantes", next: "zoom_plantes" },
+                    { text: "Revenir à la table d'optique", next: "table_geometrie" }
+                ]
+            },
+            "zoom_plantes": {
+                text: "Trois plantes (Digitale Bleue, Mandragore Jaune, Belladone Pourpre) sont alignées. Le grimoire indique laquelle doit être broyée pour obtenir la poudre d'argent.",
+                image: "assets/images/scenes/bg_zoom_plantes.webp",
+                ambience: "herbo",
+                choices: [
+                    { text: "Lire le grimoire", action: () => enigmeHerboristerie() },
+                    { text: "S'éloigner", next: "herboristerie" }
+                ]
+            },
+            "ascenseur_tour": {
+                text: "Vous atteignez la base de la Grande Tour. Un ascenseur massif barre la route. Pour l'activer, vous devez régler les contrepoids sur le panneau latéral.",
+                image: "assets/images/scenes/bg_ascenseur.webp",
+                ambience: "vent",
+                choices: [
+                    { text: "Examiner le panneau", next: "zoom_poids" },
+                    { text: "Revenir à l'herboristerie", next: "herboristerie" }
+                ]
+            },
+            "zoom_poids": {
+                text: "Trois curseurs (Soleil, Lune, Étoile) doivent être équilibrés. La stèle indique : 'Le Soleil vaut la Lune et l'Étoile. La Lune est triple de l'Étoile. Le tout pèse 160'.",
+                image: "assets/images/scenes/bg_zoom_poids.webp",
+                ambience: "vent",
+                choices: [
+                    { text: "Régler le Soleil", action: () => enigmeAscenseurPoids() },
+                    { text: "S'éloigner", next: "ascenseur_tour" }
+                ]
+            },
+            "horloge_astro": {
+                text: "L'ascenseur vous dépose au sommet de la tour. Une horloge astronomique monumentale occupe tout le mur. Ses aiguilles dorées semblent attendre une impulsion précise pour libérer le mécanisme final.",
+                image: "assets/images/scenes/bg_horloge_astro.webp",
+                ambience: "tic_tac",
+                choices: [
+                    { text: "Observer le cadran", next: "zoom_horloge" },
+                    { text: "Redescendre à l'ascenseur", next: "ascenseur_tour" }
+                ]
+            },
+            "zoom_horloge": {
+                text: "Le cadran est divisé en 12 signes. Une plaque indique : 'Le Soleil avance de 5 crans par impulsion. S'il part du 12 et reçoit 4 impulsions, où s'arrêtera-t-il ?'",
+                image: "assets/images/scenes/bg_zoom_horloge.webp",
+                ambience: "tic_tac",
+                choices: [
+                    { text: "Régler le Soleil", action: () => enigmeHorlogeAstro() },
+                    { text: "S'éloigner", next: "horloge_astro" }
+                ]
+            },
+            "observatoire": {
+                text: "L'horloge a pivoté, révélant un petit observatoire niché sous les toits de la tour. Un mécanisme de stabilisation semble bloquer l'accès final aux remparts.",
+                image: "assets/images/scenes/bg_observatoire.webp",
+                ambience: "vent_haut",
+                choices: [
+                    { text: "Examiner la console", next: "zoom_formule" },
+                    { text: "Revenir à l'horloge", next: "horloge_astro" }
+                ]
+            },
+            "zoom_formule": {
+                text: "Une plaque indique qu'il faut injecter l'élément le plus léger pour condenser la vapeur (H2O) et libérer le verrou. Vous avez déjà l'Oxygène (O).",
+                image: "assets/images/scenes/bg_zoom_formule.webp",
+                ambience: "vent_haut",
+                choices: [
+                    { text: "Injecter l'élément", action: () => enigmeStabilisationEau() },
+                    { text: "S'éloigner", next: "observatoire" }
+                ]
+            },
+            "chemin_ronde": {
+                text: "Vous sortez sur les remparts. Le vent nocturne siffle entre les créneaux. Deux gardes lourdement armés discutent près d'un brasero, bloquant l'accès à la porte du pont-levis.",
+                image: "assets/images/scenes/bg_chemin_ronde.webp",
+                ambience: "nuit",
+                choices: [
+                    { text: "Observer les gardes", next: "zoom_gardes" },
+                    { text: "Revenir à l'horloge", next: "horloge_astro" }
+                ]
+            },
+            "zoom_gardes": {
+                text: "Les gardes font leurs rondes. L'un met 4 minutes, l'autre 6 minutes. Vous devez utiliser votre Poudre de Sommeil au moment exact où ils se croisent.",
+                image: "assets/images/scenes/bg_zoom_gardes.webp",
+                ambience: "nuit",
+                choices: [
+                    { text: "Utiliser la Poudre", action: () => verifierPoudreEtEnigme() },
+                    { text: "S'éloigner", next: "chemin_ronde" }
+                ]
+            },
+            "pont_levis": {
+                text: "Devant vous se dresse l'ultime porte. Le mécanisme du pont-levis est là, imposant et complexe. La liberté n'est qu'à quelques engrenages.",
+                image: "assets/images/scenes/bg_pont_levis.webp",
+                ambience: "espoir",
+                choices: [
+                    { text: "Examiner le mécanisme", next: "zoom_mecanisme_final" },
+                    { text: "Retourner sur les remparts", next: "chemin_ronde" }
+                ]
+            },
+            "zoom_mecanisme_final": {
+                text: "Le boîtier attend ses pièces. Une inscription dit : '3 tours de Lune d'Or, 2 ailes de Dragon, 1 fer de Maître'. Vous devez insérer vos objets et entrer le code de rotation.",
+                image: "assets/images/scenes/bg_zoom_mecanisme_final.webp",
+                ambience: "espoir",
+                choices: [
+                    { text: "Actionner le mécanisme", action: () => verifierObjetsFinaux() },
+                    { text: "S'éloigner", next: "pont_levis" }
+                ]
+            },
+            "victoire": {
+                text: "Le pont s'abat dans un fracas libérateur. L'air frais de la vallée vous fouette le visage. Vous avez brisé l'Héritage du Sang. Vous faites partie des évadés du château. Vous êtes libre !",
+                image: "assets/images/scenes/bg_liberte.webp",
+                ambience: "espoir",
+                choices: [
+                    { text: "VOIR LA LISTE DES ÉVADÉS", action: () => window.afficherLesEvades() },
+                    { text: "REJOUER", action: () => location.reload() }
+                ]
+            },            
+        };
+
+        // --- LOGIQUE DE CONNEXION ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                userData = userDoc.data() || {};
+                
+                if (!Array.isArray(userData.inventory)) userData.inventory = [];
+                if (!userData.currentScene) userData.currentScene = "cellule";
+
+                document.getElementById('player-name').innerText = userData.pseudo || "Aventurier";
+                
+                // --- MODIFICATION ICI : On ne rend la scène que si elle change vraiment ---
+                if (currentActiveScene !== userData.currentScene) {
+                    currentActiveScene = userData.currentScene;
+                    renderScene(userData.currentScene);
+                }
+            } else {
+                window.location.href = "index.html";
+            }
+        });
+
+        async function ajouterObjet(nomObjet) {
+            if (!Array.isArray(userData.inventory)) userData.inventory = [];
+            if (!userData.inventory.includes(nomObjet)) {
+                userData.inventory.push(nomObjet);
+                // Mise à jour visuelle immédiate
+                document.getElementById('inventory-list').innerText = userData.inventory.join(", ");
+                // Sauvegarde dans Firebase
+                await updateDoc(doc(db, "users", currentUser.uid), {
+                    inventory: userData.inventory
+                });
+            }
+        }
+
+        // --- RENDER ET NAVIGATION ---
+        function renderScene(sceneId) {
+            const scene = scenes[sceneId];
+            if (!scene) return;
+
+            // 1. ARRÊTER TOUTES LES AMBIANCES
+            stopAllAmbiance();
+
+            // 2. LANCER L'AMBIANCE DE LA SCÈNE (si elle existe)
+            if (scene.ambience && sounds[scene.ambience]) {
+                // Si la scène dit loop: false, on ne boucle pas. Sinon, on boucle par défaut (true).
+                sounds[scene.ambience].loop = (scene.loop !== false); 
+                sounds[scene.ambience].play().catch(e => console.log("Attente action joueur pour son"));
+            }
+
+            // 3. MISE À JOUR VISUELLE (Reste identique)
+            document.getElementById('scene-container').style.backgroundImage = `url('${scene.image}')`;
+            document.getElementById('description-text').innerText = scene.text;
+            
+            const grid = document.getElementById('choices-grid');
+            grid.innerHTML = "";
+
+            scene.choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.className = "btn-game";
+                btn.innerText = choice.text;
+                btn.onclick = () => {
+                    if (choice.next) changeScene(choice.next);
+                    if (choice.action) choice.action();
+                };
+                grid.appendChild(btn);
+            });
+
+            document.getElementById('inventory-list').innerText = userData.inventory.length > 0 ? userData.inventory.join(", ") : "Vide";
+        }
+
+        async function changeScene(newSceneId) {
+            currentActiveScene = newSceneId; // On met à jour le suivi
+            userData.currentScene = newSceneId;
+            renderScene(newSceneId);
+            await updateDoc(doc(db, "users", currentUser.uid), { currentScene: newSceneId });
+        }
+
+        // --- RÉSOLUTION DES ÉNIGMES ---
+        // Fonction générique factorisant le schéma commun à toutes les énigmes :
+        // poser une question, vérifier la réponse (insensible à la casse et aux espaces),
+        // afficher le loot le cas échéant, ajouter l'objet à l'inventaire, jouer les sons
+        // et enchaîner sur la scène suivante.
+        function poserEnigme({ question, bonneReponse, titre, texte, image, objet, extraSound, playDoorSound = true, sceneSuivante, messageErreur }) {
+            UI.ask(question, (reponse) => {
+                const rep = (reponse || "").toLowerCase().trim();
+                if (rep === bonneReponse) {
+                    playSound('success');
+                    stopAllAmbiance(); 
+                    if (extraSound) playSound(extraSound);
+                    UI.showItem(titre, texte, image, async () => {
+                        if (objet) await ajouterObjet(objet);
+                        if (playDoorSound) playSound('door');
+                        changeScene(sceneSuivante);
+                    });
+                } else {
+                    playSound('error');
+                    UI.message(messageErreur);
+                }
+            });
+        }
+
+        function verifierEnigmeN() {
+            poserEnigme({
+                question: "Quelle lettre gravez-vous sur la pierre ?",
+                bonneReponse: "n",
+                titre: "BRAVO !",
+                texte: "Tu as trouvé la clé pour te libérer de tes chaînes !",
+                image: "assets/images/items/cle_chaine.webp",
+                objet: "Clé des chaînes",
+                extraSound: "chaines",
+                sceneSuivante: "couloir_01",
+                messageErreur: "Le silence vous répond."
+            });
+        }
+
+        function enigmeMathRats() {
+            poserEnigme({
+                question: "Le mécanisme murmure : 'Divise-moi deux fois par 2, ma somme est 9. Qui suis-je ?'",
+                bonneReponse: "36",
+                titre: "BRAVO !",
+                texte: "Bravo ! Vous avez résolu cette seconde énigme. La trappe du couloir va s'ouvrir pour que les rats s'échappent et libère le couloir. Poursuivez votre chemin vers la sortie !",
+                image: "assets/images/items/calcul.webp",
+                sceneSuivante: "salle_des_gardes",
+                messageErreur: "Le mécanisme refuse de bouger. Une décharge de vapeur siffle."
+            });
+        }
+
+        function enigmeCasqueOr() {
+            poserEnigme({
+                question: "L'énigme dit : 'Bronze=2kg. Argent=Bronze+moitié d'Or. Or=Bronze+Argent'. Quel est le poids de l'Or ?",
+                bonneReponse: "8",
+                titre: "OBJET TROUVÉ",
+                texte: "La balance s'équilibre ! Vous récupérez le Médaillon de Garde.",
+                image: "assets/images/items/medaillon.webp",
+                objet: "Médaillon de Garde",
+                playDoorSound: false,
+                sceneSuivante: "grille_fer", // Scène suivante à créer
+                messageErreur: "La balance ne bouge pas. Le poids est erroné."
+            });
+        }
+
+        function utiliserMedaillon() {
+            // On vérifie si l'objet est dans l'inventaire
+            if (userData.inventory.includes("Médaillon de Garde")) {
+                playSound('success');
+                playSound('herse'); 
+                UI.message("Vous insérez le médaillon dans la fente. Un mécanisme complexe s'active et la herse se soulève lourdement !", () => {                    
+                    changeScene("antichambre"); // Vers la Zone 2 !
+                });
+            } else {
+                playSound('error');
+                UI.message("Vous n'avez rien qui semble s'adapter à cette fente. Vous devriez fouiller la salle précédente.");
+            }
+        }
+
+        
+        function enigmeBlasonLoup() {
+            poserEnigme({
+                question: "Lion=Haut/Gauche. Aigle=Opposé. Serpent=Sous Lion. Quel prédateur veille au Nord de l'Aigle ?",
+                bonneReponse: "loup",
+                titre: "TRÉSOR ROYAL",
+                texte: "Le blason pivote... Vous trouvez la Bague à Sceau.",
+                image: "assets/images/items/bague_sceau.webp",
+                objet: "Bague à Sceau",            
+                extraSound: "pierre",
+                sceneSuivante: "bibliotheque",
+                messageErreur: "Le blason reste immobile."
+            });
+        }
+
+        function enigmeLivresDates() {
+            poserEnigme({
+                question: "Quelle année doit porter le grimoire (1240, 1245, 1251, 1258...) ?",
+                bonneReponse: "1266",
+                titre: "DÉCOUVERTE",
+                texte: "Le grimoire s'enclenche... Une section pivote, révélant une Fiole d'Ether.",
+                image: "assets/images/items/fiole_ether.webp",
+                objet: "Fiole d'Ether",
+                sceneSuivante: "cabinet_curiosites",
+                messageErreur: "Le livre ne rentre pas."
+            });
+        }
+
+        function enigmeFiolesEther() {
+            // Rappel calcul : (7 * 2) + (22 - 10) = 26
+            poserEnigme({
+                question: "Le nectar d'Ether doit être égal au double de la fiole la plus petite, auquel on ajoute la différence entre la plus grande et la moyenne. Quel dosage (ml) versez-vous ?",
+                bonneReponse: "26",
+                titre: "ALCHIMIE RÉUSSIE",
+                texte: "Le mélange se stabilise et libère un compartiment secret. Vous y trouvez la Clé de l'Alchimiste.",
+                image: "assets/images/items/cle_alchimiste.webp",
+                objet: "Clé de l'Alchimiste",
+                extraSound: "verre",               
+                sceneSuivante: "laboratoire_alchimie", // Première scène de la Zone 3
+                messageErreur: "Le liquide bouillonne dangereusement... Le dosage est incorrect."
+            });
+        }
+
+        function enigmeAlchimieEquilibre() {
+            poserEnigme({
+                question: "[X] Soufre + 2 Mercures = 3 Essences. (Soufre=5, Mercure=10, Essence=15). Quelle est la valeur de X ?",
+                bonneReponse: "5",
+                titre: "TRANSMUTATION RÉUSSIE",
+                texte: "L'alambic siffle une dernière fois et libère un éclat pourpre. Vous saisissez le Cristal d'Énergie.",
+                image: "assets/images/items/cristal_energie.webp",
+                objet: "Cristal d'Énergie",
+                extraSound: "spark",              
+                sceneSuivante: "table_geometrie", // Prochaine étape à préparer
+                messageErreur: "Le mélange devient instable ! La quantité de Soufre est incorrecte."
+            });
+        }
+
+        function enigmeGeometrieAngles() {
+            // Calcul : 180 - (65 + 65) = 50
+            poserEnigme({
+                question: "Si les deux angles à la base du triangle valent 65°, quel angle (en degrés) doit avoir le sommet pour que le faisceau soit parfait ?",
+                bonneReponse: "50",
+                titre: "ALIGNEMENT PARFAIT",
+                texte: "Le miroir pivote avec un clic sec. Le rayon frappe le cristal de la statue qui libère la Lentille d'Obsidienne.",
+                image: "assets/images/items/lentille_obsidienne.webp",
+                objet: "Lentille d'Obsidienne",
+                extraSound: "miroir",
+                sceneSuivante: "herboristerie", // Prochaine étape : l'Herboristerie
+                messageErreur: "Le rayon se perd dans l'obscurité. L'angle est erroné."
+            });
+        }
+
+        function enigmeHerboristerie() {
+            poserEnigme({
+                question: "Selon les indices du grimoire (Belladone à droite, Mandragore au centre, Digitale à gauche), laquelle de ces plantes fournit la poudre d'argent ?",
+                bonneReponse: "digitale",
+                titre: "PRÉPARATION RÉUSSIE",
+                texte: "Vous broyez soigneusement les pétales bleus. Une fine poudre argentée se forme. Vous récupérez la Poudre de Sommeil.",
+                image: "assets/images/items/poudre_sommeil.webp",
+                objet: "Poudre de Sommeil",
+                extraSound: "coupe",               
+                sceneSuivante: "ascenseur_tour", // Transition vers la Zone 4 (La Tour)
+                messageErreur: "La mixture devient sombre et malodorante. Ce n'est pas la bonne plante."
+            });
+        }
+
+        function enigmeAscenseurPoids() {
+            poserEnigme({
+                question: "Si le total est 160, que le Soleil = Lune + Étoile, et que la Lune = 3 x Étoile... Quel est le poids du Soleil ?",
+                bonneReponse: "80",
+                titre: "MÉCANISME ENCLENCHÉ",
+                texte: "Dans un fracas de chaînes, l'ascenseur s'ébranle et monte vers les sommets. Vous trouvez une Manivelle de Bronze au sol.",
+                image: "assets/images/items/manivelle_bronze.webp",
+                objet: "Manivelle de Bronze",
+                extraSound: "mecanisme",
+                sceneSuivante: "horloge_astro", // Prochaine étape : L'Horloge
+                messageErreur: "Les contrepoids refusent de bouger. L'équilibre est rompu."
+            });
+        }
+
+        function enigmeHorlogeAstro() {
+            // Calcul : (5 * 4) = 20. 20 mod 12 = 8.
+            poserEnigme({
+                question: "Sur quel chiffre (1 à 12) le Soleil finira-t-il sa course après 4 impulsions de 5 crans ?",
+                bonneReponse: "8",
+                titre: "ALIGNEMENT CÉLESTE",
+                texte: "Les rouages s'alignent dans un bourdonnement harmonieux. Un compartiment secret s'ouvre, révélant un Rouage d'Or.",
+                image: "assets/images/items/rouage_or.webp",
+                objet: "Rouage d'Or",
+                extraSound: "engrenage",
+                sceneSuivante: "observatoire", // Prochaine étape : Les Gardes
+                messageErreur: "L'aiguille tremble mais revient à sa place. Le calcul est faux."
+            });
+        }
+
+        function verifierPoudreEtEnigme() {
+            if (userData.inventory.includes("Poudre de Sommeil")) {
+                enigmeGardesSommeil();
+            } else {
+                playSound('error');
+                UI.message("Vous n'avez rien pour neutraliser ces gardes discrètement. Vous devriez fouiller l'herboristerie.");
+            }
+        }
+
+        function enigmeStabilisationEau() {
+            poserEnigme({
+                question: "Quel symbole chimique (une seule lettre) faut-il ajouter deux fois à l'Oxygène (O) pour former la molécule d'eau indispensable à la vie ?",
+                bonneReponse: "h",
+                titre: "ÉQUILIBRE ATTEINT",
+                texte: "La vapeur se condense instantanément. Le verrou givré de la porte des remparts explose, libérant le passage. Vous récupérez un Condenseur de Vapeur.",
+                image: "assets/images/items/condenseur_vapeur.webp",
+                objet: "Condenseur de Vapeur",
+                extraSound: "gaz",
+                sceneSuivante: "chemin_ronde", // Maintenant on va vers les gardes
+                messageErreur: "Le mélange reste gazeux. L'élément injecté n'est pas le bon."
+            });
+        }
+
+        function enigmeGardesSommeil() {
+            // Calcul PPCM de 4 et 6 = 12
+            poserEnigme({
+                question: "Si le premier garde passe toutes les 4 min et le second toutes les 6 min, dans combien de minutes se croiseront-ils à nouveau devant vous ?",
+                bonneReponse: "12",
+                titre: "GARDES NEUTRALISÉS",
+                texte: "Vous lancez la poudre au moment précis. Les gardes s'effondrent dans un sommeil profond. Vous récupérez la Clé du Pont-Levis sur l'un d'eux.",
+                image: "assets/images/items/cle_pont_levis.webp",
+                objet: "Clé du Pont-Levis",
+                extraSound: "sommeil",
+                sceneSuivante: "pont_levis", // Vers le grand final !
+                messageErreur: "Votre jet est mal synchronisé. Les gardes sont alertés mais vous parvenez à vous cacher de justesse !"
+            });
+        }
+
+        function verifierObjetsFinaux() {
+            const inventaire = userData.inventory;
+            if (inventaire.includes("Rouage d'Or") && inventaire.includes("Manivelle de Bronze") && inventaire.includes("Clé du Pont-Levis")) {
+                enigmeFinaleCombinaison();
+            } else {
+                playSound('error');
+                UI.message("Il vous manque des éléments pour activer ce mécanisme. Avez-vous exploré la tour et neutralisé les gardes ?");
+            }
+        }
+
+        function enigmeFinaleCombinaison() {
+            poserEnigme({
+                question: "En suivant l'ordre des rotations (Rouage, Manivelle, Clé), quel est le code final à inscrire ?",
+                bonneReponse: "321",
+                titre: "LIBERTÉ !",
+                texte: "Les rouages s'enclenchent, les chaînes se déroulent... Le pont-levis descend lentement vers la vallée !",
+                image: "assets/images/items/bg_libre.webp",
+                playDoorSound: false,
+                extraSound: "ouverture",
+                sceneSuivante: "victoire",
+                messageErreur: "Les objets s'entrechoquent mais rien ne bouge. La séquence est mauvaise."
+            });
+
+            // --- AJOUT : On marque le succès dans Firebase ---
+            updateDoc(doc(db, "users", currentUser.uid), { 
+                hasEscaped: true,
+                escapedAt: new Date() 
+            });
+        }
+
+        // --- LOGIQUE DU HALL OF FAME ---
+        async function afficherLesEvades() {
+            const hallModal = document.getElementById('hall-modal');
+            const hallList = document.getElementById('hall-list');
+            
+            // On vide et on montre un message de chargement
+            hallList.innerHTML = "<div style='text-align:center; padding:20px;'>Le parchemin se déroule...</div>";
+            hallModal.style.display = 'flex';
+
+            try {
+                // Requête : Tous les utilisateurs ayant terminé (hasEscaped == true) triés par date
+                const q = query(
+                    collection(db, "users"), 
+                    where("hasEscaped", "==", true), 
+                    orderBy("escapedAt", "desc")
+                );
+                
+                const querySnapshot = await getDocs(q);
+                
+                // On commence par mettre le joueur actuel en haut de liste
+                let listeHTML = `<div style="color: #8b0000; border-bottom: 2px dashed #3d2b1f; margin-bottom: 15px; padding-bottom: 5px;">⭐ ${userData.pseudo} (Vous)</div>`;
+                
+                let count = 0;
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    // On évite de se doubler dans la liste
+                    if (data.pseudo !== userData.pseudo) {
+                        listeHTML += `<div style="margin-bottom: 8px;">${data.pseudo}</div>`;
+                        count++;
+                    }
+                });
+
+                if(count === 0 && querySnapshot.empty) {
+                    listeHTML = "<div>Vous êtes le premier à vous évader !</div>";
+                }
+
+                hallList.innerHTML = listeHTML;
+            } catch (e) {
+                console.error("Erreur Hall of Fame:", e);
+                hallList.innerHTML = "<div style='font-size:0.9rem;'>Le mécanisme de la liste est grippé... (Vérifiez les index Firebase)</div>";
+            }
+        }
+
+        // On rend la fonction disponible pour le bouton HTML
+        window.afficherLesEvades = afficherLesEvades;
+
+        window.logout = () => signOut(auth);
+
+    </script>
+</body>
+</html>
