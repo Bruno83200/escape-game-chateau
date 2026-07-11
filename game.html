@@ -24,11 +24,16 @@
 
         #scene-container {
             position: relative;
-            width: 100vw; height: 100vh;
-            background-size: cover;
-            background-position: center;
+            width: 100vw; 
+            height: 100vh;
+            background-size: cover; /* Remplit l'écran */
+            background-position: center center; /* Centre l'image */
+            background-repeat: no-repeat;
             transition: background-image 1s ease-in-out;
-            display: flex; flex-direction: column; justify-content: flex-end;
+            display: flex; 
+            flex-direction: column; 
+            justify-content: flex-end;
+            overflow: hidden; /* Empêche le défilement parasite */
         }
 
         /* BARRE SUPÉRIEURE */
@@ -113,6 +118,8 @@
 
         .item-modal-left img {
             max-width: 100%;
+            max-height: 250px; /* Force l'image à ne pas être trop haute sur mobile */
+            object-fit: contain; /* Garde les proportions sans déformer */
             filter: drop-shadow(0 0 20px var(--gold));
             animation: itemFloat 3s ease-in-out infinite;
         }
@@ -144,12 +151,21 @@
 
         /* RESPONSIVE SMARTPHONE */
         @media (max-width: 768px) {
-            #ui-panel { padding: 25px 15px; }
-            #description-text { font-size: 1.1rem; }
-            .btn-game { width: 100%; padding: 15px; }
-            .item-modal-content { flex-direction: column; }
-            .item-modal-left { padding: 20px; }
-            .item-modal-right { padding: 30px; text-align: center; }
+            #ui-panel { padding: 15px 10px; min-height: 120px; }
+            #description-text { font-size: 1rem; margin-bottom: 10px; }
+            .btn-game { width: 100%; padding: 12px; font-size: 0.85rem; }
+            
+            /* Ajustement de la modale de loot */
+            .item-modal-content { 
+                flex-direction: column; 
+                width: 95%; 
+                max-height: 90vh; 
+                overflow-y: auto; 
+            }
+            .item-modal-left { padding: 15px; border-right: none; border-bottom: 1px solid rgba(212, 175, 55, 0.2); }
+            .item-modal-right { padding: 20px; text-align: center; }
+            #item-modal-title { font-size: 1.5rem; }
+            #item-modal-text { font-size: 1rem; margin-bottom: 15px; }
         }
     </style>
 </head>
