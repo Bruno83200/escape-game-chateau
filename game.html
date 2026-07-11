@@ -24,13 +24,15 @@
 
         #scene-container {
             position: relative;
-            width: 100vw; 
-            height: 100vh;
-            background-size: cover;
-            background-position: center;
+            width: 100vw;
+            /* Utilise la hauteur disponible réelle du mobile */
+            height: 100vh; 
+            height: 100svh; 
+            background-color: #000;
+            background-size: cover; /* Remplit l'écran */
+            background-position: center center; /* CENTRE l'image impérativement */
             background-repeat: no-repeat;
-            /* La transition est fluide ici */
-            transition: background-image 0.8s ease-in-out; 
+            transition: background-image 0.8s ease-in-out;
             display: flex; 
             flex-direction: column; 
             justify-content: flex-end;
@@ -118,8 +120,10 @@
         }
 
         .item-modal-left img {
-            max-width: 90%;
-            /* On laisse la taille naturelle sur PC */
+            max-width: 100%;
+            /* Limite la hauteur de l'objet pour qu'il ne pousse pas tout le texte */
+            max-height: 200px; 
+            object-fit: contain;
             filter: drop-shadow(0 0 20px var(--gold));
             animation: itemFloat 3s ease-in-out infinite;
         }
@@ -151,25 +155,25 @@
 
         /* RESPONSIVE SMARTPHONE */
         @media (max-width: 768px) {
-            #ui-panel { padding: 15px 10px; min-height: 120px; }
-            .btn-game { width: 100%; padding: 12px; font-size: 0.85rem; }
-
-            /* Ici, on force la petite taille seulement sur mobile */
-            .item-modal-left img {
-                max-height: 180px; 
-                max-width: 100%;
-                object-fit: contain;
+            #ui-panel { 
+                padding: 10px 15px; 
+                min-height: 100px; /* Plus petit pour voir le décor */
             }
-
-            .item-modal-content { 
-                flex-direction: column; 
-                width: 95%; 
-                max-height: 90vh; 
+            #description-text { 
+                font-size: 0.95rem; /* Texte un peu plus petit */
+                line-height: 1.2;
+                margin-bottom: 10px;
             }
-            .item-modal-left { 
-                padding: 10px; 
-                border-right: none; 
-                border-bottom: 1px solid rgba(212, 175, 55, 0.2); 
+            .btn-game { 
+                padding: 8px 15px; 
+                font-size: 0.8rem; 
+            }
+            
+            /* Pour que la modale d'objet ne dépasse pas */
+            .item-modal-content {
+                flex-direction: column;
+                max-height: 95vh;
+                overflow-y: auto;
             }
         }
     </style>
