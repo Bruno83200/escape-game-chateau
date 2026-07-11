@@ -26,14 +26,15 @@
             position: relative;
             width: 100vw; 
             height: 100vh;
-            background-size: cover; /* Remplit l'écran */
-            background-position: center center; /* Centre l'image */
+            background-size: cover;
+            background-position: center;
             background-repeat: no-repeat;
-            transition: background-image 1s ease-in-out;
+            /* La transition est fluide ici */
+            transition: background-image 0.8s ease-in-out; 
             display: flex; 
             flex-direction: column; 
             justify-content: flex-end;
-            overflow: hidden; /* Empêche le défilement parasite */
+            overflow: hidden;
         }
 
         /* BARRE SUPÉRIEURE */
@@ -55,9 +56,9 @@
             z-index: 10;
             text-align: center;
             
-            /* AJOUTE CES DEUX LIGNES ICI */
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            /* On descend de 12px à 6px pour la fluidité */
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
         }
         
         #description-text {
@@ -117,9 +118,8 @@
         }
 
         .item-modal-left img {
-            max-width: 100%;
-            max-height: 250px; /* Force l'image à ne pas être trop haute sur mobile */
-            object-fit: contain; /* Garde les proportions sans déformer */
+            max-width: 90%;
+            /* On laisse la taille naturelle sur PC */
             filter: drop-shadow(0 0 20px var(--gold));
             animation: itemFloat 3s ease-in-out infinite;
         }
@@ -152,20 +152,25 @@
         /* RESPONSIVE SMARTPHONE */
         @media (max-width: 768px) {
             #ui-panel { padding: 15px 10px; min-height: 120px; }
-            #description-text { font-size: 1rem; margin-bottom: 10px; }
             .btn-game { width: 100%; padding: 12px; font-size: 0.85rem; }
-            
-            /* Ajustement de la modale de loot */
+
+            /* Ici, on force la petite taille seulement sur mobile */
+            .item-modal-left img {
+                max-height: 180px; 
+                max-width: 100%;
+                object-fit: contain;
+            }
+
             .item-modal-content { 
                 flex-direction: column; 
                 width: 95%; 
                 max-height: 90vh; 
-                overflow-y: auto; 
             }
-            .item-modal-left { padding: 15px; border-right: none; border-bottom: 1px solid rgba(212, 175, 55, 0.2); }
-            .item-modal-right { padding: 20px; text-align: center; }
-            #item-modal-title { font-size: 1.5rem; }
-            #item-modal-text { font-size: 1rem; margin-bottom: 15px; }
+            .item-modal-left { 
+                padding: 10px; 
+                border-right: none; 
+                border-bottom: 1px solid rgba(212, 175, 55, 0.2); 
+            }
         }
     </style>
 </head>
