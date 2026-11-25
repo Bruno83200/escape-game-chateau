@@ -1,0 +1,759 @@
+/* ==========================================================================
+   ATELIERS & INSTRUMENTS MÉDIÉVAUX — L'HÉRITAGE DU SANG
+   ========================================================================== */
+
+.workbench-modal {
+  position: relative;
+  width: 100%;
+  max-width: 880px;
+  max-height: 92dvh;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-modal);
+  animation: folioAppear 0.34s var(--ease-folio) forwards;
+}
+
+.workbench-header {
+  padding: 18px 54px 14px 26px;
+  background: linear-gradient(180deg, rgba(236, 222, 192, 0.94), rgba(247, 238, 219, 0.82));
+  border-bottom: 1px solid rgba(174, 123, 36, 0.48);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.workbench-title-group h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.06rem, 2vw, 1.32rem);
+  font-weight: 700;
+  color: var(--crimson-800);
+  margin: 4px 0 0;
+  letter-spacing: 0.06em;
+}
+
+.workbench-body { padding: 20px 26px 22px; overflow-y: auto; flex: 1; }
+
+.workbench-instruction {
+  font-family: var(--font-serif);
+  font-size: 1.18rem;
+  line-height: 1.48;
+  color: var(--ink-800);
+  margin: 0 0 18px;
+  padding: 11px 16px;
+  background: rgba(255, 253, 248, 0.88);
+  border-left: 3px solid var(--crimson-700);
+  border-radius: 0 4px 4px 0;
+}
+
+.workbench-status {
+  margin-top: 14px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.92rem;
+  line-height: 1.42;
+  display: none;
+  align-items: center;
+  gap: 9px;
+}
+
+.workbench-status.is-error { display: flex; background: var(--crimson-100); border: 1px solid rgba(147, 28, 41, 0.42); color: var(--crimson-800); }
+.workbench-status.is-success { display: flex; background: var(--emerald-100); border: 1px solid rgba(29, 100, 72, 0.45); color: var(--emerald-600); font-weight: 600; }
+.workbench-status.is-info { display: flex; background: rgba(174, 123, 36, 0.14); border: 1px solid rgba(174, 123, 36, 0.4); color: var(--ink-800); }
+
+.workbench-hint-box {
+  display: none;
+  margin-top: 12px;
+  padding: 11px 14px;
+  background: rgba(229, 190, 107, 0.22);
+  border: 1px dashed var(--gold-600);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-serif);
+  font-size: 1.06rem;
+  font-style: italic;
+  color: var(--ink-800);
+}
+
+.workbench-hint-box.is-open { display: block; }
+
+.workbench-footer {
+  padding: 13px 26px;
+  border-top: 1px solid rgba(174, 123, 36, 0.36);
+  background: rgba(236, 222, 192, 0.62);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Bandeau miniature d'archive cliquable */
+.ref-strip {
+  width: 100%;
+  max-width: 580px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 253, 248, 0.9);
+  border: 1px solid rgba(174, 123, 36, 0.48);
+  box-shadow: 0 3px 10px rgba(30, 21, 18, 0.08);
+}
+
+.ref-strip img {
+  width: 72px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1.5px solid var(--gold-500);
+  cursor: zoom-in;
+  flex-shrink: 0;
+}
+
+.ref-strip span { font-family: var(--font-serif); font-size: 1.02rem; color: var(--ink-700); line-height: 1.35; }
+
+/* Mise en page commune d'atelier */
+.mg-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.mg-panel {
+  width: 100%;
+  max-width: 600px;
+  padding: 18px 20px;
+  background: linear-gradient(180deg, #faf2e1 0%, #ebd9b6 100%);
+  border: 1.5px solid var(--gold-500);
+  border-radius: var(--radius-md);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 6px 20px rgba(30, 21, 18, 0.12);
+}
+
+.mg-pills {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.mg-pill {
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(255, 253, 248, 0.92);
+  border: 1px solid rgba(174, 123, 36, 0.48);
+  font-size: 0.84rem;
+  color: var(--ink-700);
+}
+
+.mg-pill strong { font-family: var(--font-display); color: var(--crimson-800); }
+.mg-pill.is-ok { background: var(--emerald-100); border-color: rgba(29, 100, 72, 0.48); color: var(--emerald-600); }
+.mg-pill.is-ok strong { color: var(--emerald-600); }
+
+/* ==========================================================================
+   1. DALLE GRAVÉE (LETTRE N)
+   ========================================================================== */
+.stone-tablet {
+  width: 100%;
+  max-width: 560px;
+  padding: 20px 22px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(160deg, #2b2523 0%, #191514 100%);
+  border: 2px solid var(--gold-600);
+  color: #f3e6cc;
+  text-align: center;
+  box-shadow: 0 12px 28px rgba(18, 10, 8, 0.35);
+}
+
+.stone-riddle {
+  font-family: var(--font-serif);
+  font-size: 1.24rem;
+  line-height: 1.55;
+  font-style: italic;
+  margin: 0 0 14px;
+}
+
+.stone-riddle mark {
+  background: rgba(203, 151, 56, 0.35);
+  color: #ffe299;
+  padding: 0 3px;
+  border-radius: 3px;
+  font-weight: 700;
+}
+
+.stone-chisel-slot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 68px;
+  height: 68px;
+  border-radius: 8px;
+  border: 2px dashed var(--gold-500);
+  background: rgba(255, 255, 255, 0.06);
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffe299;
+}
+
+.rune-keyboard {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  max-width: 560px;
+}
+
+.rune-key {
+  width: 46px;
+  height: 46px;
+  border-radius: 6px;
+  border: 1.5px solid var(--gold-600);
+  background: linear-gradient(180deg, #fffdf9 0%, var(--vellum-200) 100%);
+  color: var(--crimson-800);
+  font-family: var(--font-display);
+  font-size: 1.12rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 3px 9px rgba(30, 21, 18, 0.12);
+  transition: all 0.16s ease;
+}
+
+.rune-key:hover, .rune-key.is-active {
+  background: var(--crimson-800);
+  color: #fce29f;
+  transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   2. ROUAGES & CADRANS ROTATIFS (36, 3-2-1)
+   ========================================================================== */
+.dial-wheels {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.dial-wheel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.dial-label {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold-700);
+}
+
+.dial-arrow {
+  width: 60px;
+  height: 30px;
+  border-radius: 5px;
+  border: 1px solid rgba(174, 123, 36, 0.58);
+  background: linear-gradient(180deg, #fffdf9, var(--vellum-200));
+  color: var(--crimson-800);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.dial-arrow:hover { background: var(--crimson-800); color: #fff; }
+
+.dial-drum {
+  width: 60px;
+  height: 66px;
+  border-radius: 7px;
+  background: linear-gradient(180deg, #5d121c 0%, #3a0910 50%, #521019 100%);
+  border: 2px solid var(--gold-500);
+  color: #fce29f;
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+/* ==========================================================================
+   3. BALANCE DES CASQUES, ALAMBIC & OPTIQUE (SVG + CURSEURS)
+   ========================================================================== */
+.svg-stage-box {
+  width: 100%;
+  max-width: 500px;
+  padding: 14px;
+  background: linear-gradient(180deg, #faf2e1 0%, #ebd9b6 100%);
+  border: 1.5px solid var(--gold-500);
+  border-radius: var(--radius-md);
+  display: flex;
+  justify-content: center;
+}
+
+.svg-stage-box svg { max-width: 100%; height: auto; }
+
+.slider-control-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 440px;
+}
+
+.slider-control-row input[type="range"] {
+  flex: 1;
+  accent-color: var(--crimson-800);
+  cursor: pointer;
+}
+
+.step-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 5px;
+  border: 1px solid var(--gold-600);
+  background: var(--vellum-50);
+  color: var(--crimson-800);
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.step-btn:hover { background: var(--crimson-800); color: #fff; }
+
+.readout-badge {
+  min-width: 68px;
+  text-align: center;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: var(--crimson-800);
+  color: #fce29f;
+  font-family: var(--font-display);
+  font-size: 0.94rem;
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   4. BLASON HÉRALDIQUE (LOUP) & PLANTES DE L'HERBORISTERIE (DIGITALE)
+   ========================================================================== */
+.shield-grid {
+  width: 280px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  padding: 12px;
+  background: linear-gradient(160deg, #5e131d, #3a0910);
+  border: 3px solid var(--gold-500);
+  border-radius: 14px 14px 86px 86px;
+  box-shadow: 0 12px 28px rgba(30, 12, 14, 0.34);
+}
+
+.shield-quarter {
+  height: 112px;
+  background: linear-gradient(180deg, #fdf8ec, #eddab5);
+  border: 1.5px solid var(--gold-600);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px;
+  text-align: center;
+}
+
+.shield-quarter.is-bl { border-bottom-left-radius: 66px; }
+.shield-quarter.is-br { border-bottom-right-radius: 66px; }
+.shield-quarter.is-missing {
+  background: rgba(255, 245, 224, 0.16);
+  border: 2px dashed var(--gold-400);
+  color: #fce29f;
+}
+
+.shield-q-name { font-family: var(--font-display); font-size: 0.78rem; font-weight: 700; color: var(--crimson-800); }
+.shield-quarter.is-missing .shield-q-name { color: #fce29f; }
+.shield-q-pos { font-size: 0.68rem; color: var(--ink-500); }
+.shield-quarter.is-missing .shield-q-pos { color: rgba(252, 226, 159, 0.78); }
+
+.choice-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(110px, 1fr));
+  gap: 10px;
+  width: 100%;
+  max-width: 560px;
+}
+
+.herald-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 13px 10px;
+  border-radius: 8px;
+  border: 1.5px solid var(--gold-600);
+  background: linear-gradient(180deg, #fffdf9, #f0dfc0);
+  color: var(--crimson-800);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s var(--ease-folio);
+}
+
+.herald-card:hover { transform: translateY(-2px); border-color: var(--crimson-700); background: #ffffff; }
+.herald-card.is-selected { background: var(--crimson-800); color: #fce29f; border-color: var(--gold-400); }
+
+/* Hotspots photo (Herboristerie) */
+.hotspot-frame {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 2px solid var(--gold-500);
+  box-shadow: 0 12px 34px rgba(30, 21, 18, 0.26);
+  user-select: none;
+}
+
+.hotspot-frame img { display: block; width: 100%; height: auto; pointer-events: none; }
+
+.hotspot-zone {
+  position: absolute;
+  border: 2px solid rgba(229, 190, 107, 0.45);
+  background: rgba(253, 249, 240, 0.04);
+  cursor: pointer;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 10px;
+  transition: all 0.22s ease;
+}
+
+.hotspot-zone:hover { background: rgba(229, 190, 107, 0.2); border-color: var(--gold-400); }
+.hotspot-zone.is-hit { background: rgba(29, 100, 72, 0.28); border-color: #4bd19e; }
+.hotspot-zone.is-miss { background: rgba(147, 28, 41, 0.3); border-color: var(--crimson-600); }
+
+.hotspot-tag {
+  background: rgba(253, 249, 240, 0.94);
+  color: var(--crimson-800);
+  border: 1px solid var(--gold-500);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.24);
+}
+
+/* ==========================================================================
+   5. RAYONNAGE BIBLIOTHÈQUE (1266) & ÉPROUVETTE D'ÉTHER (26 ml)
+   ========================================================================== */
+.bookshelf-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 8px;
+  padding: 18px 20px 14px;
+  background: linear-gradient(180deg, #3c291f 0%, #241812 100%);
+  border: 2px solid var(--gold-600);
+  border-radius: var(--radius-md);
+  width: 100%;
+  max-width: 540px;
+}
+
+.book-spine {
+  width: 74px;
+  height: 156px;
+  border-radius: 4px 4px 2px 2px;
+  background: linear-gradient(90deg, #4b1d1b 0%, #6d2624 50%, #431817 100%);
+  border: 1.5px solid var(--gold-500);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 4px;
+  color: #fce29f;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.45);
+}
+
+.book-spine.is-slot {
+  background: rgba(255, 245, 224, 0.08);
+  border: 2px dashed var(--gold-400);
+  color: rgba(252, 226, 159, 0.72);
+  justify-content: center;
+}
+
+.book-spine.is-filled {
+  background: linear-gradient(90deg, #741520 0%, #9b2230 50%, #65111a 100%);
+  border-style: solid;
+  color: #fff3cc;
+}
+
+.book-choices {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.book-pick-btn {
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: 1.5px solid var(--gold-600);
+  background: linear-gradient(180deg, #fffdf9, var(--vellum-200));
+  color: var(--crimson-800);
+  font-family: var(--font-display);
+  font-size: 0.94rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.book-pick-btn:hover, .book-pick-btn.is-selected {
+  background: var(--crimson-800);
+  color: #fce29f;
+}
+
+.beaker-layout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.flask-cards {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.flask-tag {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(174, 123, 36, 0.5);
+  background: rgba(255, 253, 248, 0.92);
+  text-align: center;
+  min-width: 102px;
+}
+
+.flask-dot {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  margin-bottom: 4px;
+}
+
+.beaker-cylinder {
+  position: relative;
+  width: 108px;
+  height: 170px;
+  border-radius: 8px 8px 18px 18px;
+  border: 2.5px solid var(--gold-600);
+  background: linear-gradient(90deg, rgba(255,255,255,0.6), rgba(242,232,250,0.85), rgba(255,255,255,0.45));
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 16px rgba(116, 21, 32, 0.14);
+}
+
+.beaker-liquid {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(180deg, #9d3bc2 0%, #5b1775 100%);
+  transition: height 0.35s var(--ease-folio);
+}
+
+.beaker-val {
+  position: relative;
+  z-index: 2;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(253, 249, 240, 0.92);
+  color: var(--crimson-800);
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   6. CONTREPOIDS DE LA TOUR, CONSOLE H2O, CHRONOGRAPHE & PONT-LEVIS
+   ========================================================================== */
+.brass-sliders {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  width: 100%;
+  max-width: 560px;
+}
+
+.brass-col {
+  padding: 14px 12px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #f3e4bd 0%, #dcc184 100%);
+  border: 1.5px solid var(--gold-700);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.brass-col h4 { font-family: var(--font-display); font-size: 0.84rem; color: var(--crimson-800); margin: 0; }
+.brass-big { font-family: var(--font-display); font-size: 1.55rem; font-weight: 700; color: var(--ink-900); }
+
+.valves-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: 100%;
+  max-width: 520px;
+}
+
+.valve-btn {
+  padding: 12px 10px;
+  border-radius: 8px;
+  border: 1.5px solid var(--gold-600);
+  background: linear-gradient(180deg, #fffdf9, #eedcb8);
+  color: var(--ink-900);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  transition: all 0.2s ease;
+}
+
+.valve-btn strong { font-family: var(--font-display); font-size: 1.25rem; color: var(--crimson-800); }
+.valve-btn span { font-size: 0.76rem; color: var(--ink-500); }
+.valve-btn:hover { border-color: var(--crimson-700); transform: translateY(-2px); }
+.valve-btn.is-active { background: var(--crimson-800); border-color: var(--gold-400); }
+.valve-btn.is-active strong, .valve-btn.is-active span { color: #fce29f; }
+
+.molecule-banner {
+  padding: 14px 24px;
+  border-radius: 10px;
+  background: linear-gradient(160deg, #1b2838, #0f1722);
+  border: 2px solid var(--gold-500);
+  color: #a8e2ff;
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  box-shadow: 0 0 22px rgba(72, 168, 255, 0.28);
+}
+
+/* Chronographe des gardes (PPCM 4 & 6 = 12) */
+.patrol-track-wrap {
+  width: 100%;
+  max-width: 580px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.patrol-lane {
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgba(255, 253, 248, 0.9);
+  border: 1px solid rgba(174, 123, 36, 0.48);
+}
+
+.patrol-lane-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  color: var(--ink-700);
+  margin-bottom: 8px;
+}
+
+.patrol-lane-head strong { font-family: var(--font-display); color: var(--crimson-800); }
+
+.patrol-dots {
+  display: grid;
+  grid-template-columns: repeat(18, 1fr);
+  gap: 3px;
+}
+
+.patrol-cell {
+  height: 22px;
+  border-radius: 3px;
+  background: rgba(174, 123, 36, 0.14);
+  font-size: 0.64rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-500);
+}
+
+.patrol-cell.is-pass { background: rgba(116, 21, 32, 0.25); color: var(--crimson-800); font-weight: 700; }
+.patrol-cell.is-now { outline: 2px solid var(--gold-600); background: var(--crimson-800); color: #fce29f; font-weight: 700; }
+.patrol-cell.is-meet { background: var(--emerald-600); color: #fff; font-weight: 700; }
+
+/* Insertion des 3 reliques finales */
+.bridge-slots {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  width: 100%;
+  max-width: 560px;
+}
+
+.bridge-slot {
+  padding: 12px 10px;
+  border-radius: 8px;
+  border: 2px dashed rgba(174, 123, 36, 0.6);
+  background: rgba(255, 253, 248, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bridge-slot img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 1.5px solid var(--gold-500);
+  opacity: 0.45;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.bridge-slot.is-inserted {
+  border-style: solid;
+  border-color: var(--emerald-600);
+  background: var(--emerald-100);
+}
+
+.bridge-slot.is-inserted img { opacity: 1; transform: scale(1.06); }
+.bridge-slot strong { font-family: var(--font-display); font-size: 0.74rem; color: var(--crimson-800); text-align: center; }
+.bridge-slot span { font-size: 0.72rem; color: var(--ink-500); }
+
+@media (max-width: 720px) {
+  .workbench-body { padding: 14px 16px 18px; }
+  .workbench-header { padding: 14px 48px 12px 16px; }
+  .workbench-footer { padding: 12px 16px; }
+  .choice-cards-grid { grid-template-columns: repeat(2, 1fr); }
+  .brass-sliders, .valves-grid, .bridge-slots { grid-template-columns: 1fr; }
+  .book-spine { width: 52px; height: 122px; font-size: 0.78rem; }
+}

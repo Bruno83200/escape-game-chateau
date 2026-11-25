@@ -1,0 +1,673 @@
+/* ==========================================================================
+   EXPLORATION — GRIMOIRE ENLUMINÉ LUMINEUX & SALLES DU CHÂTEAU
+   ========================================================================== */
+
+body.game-page {
+  overflow: hidden;
+  height: 100dvh;
+  width: 100vw;
+  background: #0e0b0d;
+}
+
+#scene-stage {
+  position: relative;
+  width: 100vw;
+  height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.scene-layer {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transform: scale(1.03);
+  transition: opacity 0.85s ease;
+  z-index: 0;
+  will-change: opacity, transform;
+}
+
+.scene-layer.is-visible {
+  opacity: 1;
+  animation: sceneKenBurns 26s ease-in-out infinite alternate;
+}
+
+@keyframes sceneKenBurns {
+  from { transform: scale(1.01) translate(0, 0); }
+  to { transform: scale(1.065) translate(-0.8%, -0.6%); }
+}
+
+.scene-vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(12, 6, 8, 0.4) 0%, rgba(12, 6, 8, 0) 24%, rgba(12, 6, 8, 0) 64%, rgba(12, 6, 8, 0.48) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.scene-draft-frame {
+  position: absolute;
+  inset: 10px;
+  border: 1px solid rgba(229, 190, 107, 0.26);
+  border-radius: 6px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* RUBAN SUPÉRIEUR PARCHEMIN & SCEAU DE CIRE */
+.top-ribbon {
+  position: relative;
+  z-index: 30;
+  margin: 16px 20px 0;
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-radius: var(--radius-md);
+  background: var(--vellum-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(174, 123, 36, 0.62);
+  box-shadow: 0 10px 32px rgba(14, 6, 6, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.88);
+}
+
+.ribbon-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.ribbon-seal {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--crimson-600), var(--crimson-900));
+  color: var(--gold-400);
+  border: 1.5px solid var(--gold-500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 3px 12px rgba(76, 11, 19, 0.42);
+}
+
+.ribbon-seal svg { width: 19px; height: 19px; }
+
+.ribbon-location { min-width: 0; }
+
+.ribbon-zone-label {
+  font-family: var(--font-display);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold-700);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ribbon-scene-title {
+  font-family: var(--font-display);
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: var(--crimson-800);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Boussole des 4 Actes du Château */
+.zone-stepper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.zone-step { display: flex; align-items: center; gap: 6px; }
+
+.zone-node {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  border: 1px solid rgba(174, 123, 36, 0.36);
+  background: rgba(255, 255, 255, 0.62);
+  color: var(--ink-500);
+  transition: all 0.3s ease;
+}
+
+.zone-node.is-done {
+  background: var(--emerald-100);
+  border-color: rgba(29, 100, 72, 0.48);
+  color: var(--emerald-600);
+}
+
+.zone-node.is-active {
+  background: var(--crimson-800);
+  border-color: var(--gold-500);
+  color: var(--vellum-50);
+  box-shadow: 0 2px 10px rgba(116, 21, 32, 0.32);
+}
+
+.zone-connector {
+  width: 12px;
+  height: 1.5px;
+  background: rgba(174, 123, 36, 0.38);
+}
+
+.zone-connector.is-done { background: var(--emerald-500); }
+
+.ribbon-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.player-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  background: var(--crimson-100);
+  border: 1px solid rgba(116, 21, 32, 0.22);
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--crimson-800);
+  letter-spacing: 0.06em;
+  max-width: 165px;
+}
+
+.player-chip span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-journal { position: relative; }
+
+.journal-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--crimson-700);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(116, 21, 32, 0.45);
+}
+
+.journal-badge.has-items { display: inline-flex; }
+
+.btn-audio.is-muted {
+  color: var(--crimson-700);
+  border-color: rgba(147, 28, 41, 0.42);
+}
+
+/* Bannière d'entrée d'Acte */
+.zone-announcement {
+  position: fixed;
+  top: 86px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+  z-index: 40;
+  padding: 10px 28px;
+  border-radius: 999px;
+  background: rgba(253, 249, 240, 0.96);
+  border: 1.5px solid var(--gold-500);
+  box-shadow: 0 12px 34px rgba(14, 6, 6, 0.34);
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s ease, transform 0.45s var(--ease-folio);
+}
+
+.zone-announcement.is-shown {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.zone-announcement-kicker {
+  font-family: var(--font-display);
+  font-size: 0.64rem;
+  letter-spacing: 0.2em;
+  color: var(--gold-700);
+  text-transform: uppercase;
+}
+
+.zone-announcement-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--crimson-800);
+  letter-spacing: 0.08em;
+}
+
+/* FOLIO INFÉRIEUR GRIMOIRE FLOTTANT */
+.folio-dock-wrap {
+  position: relative;
+  z-index: 30;
+  width: 100%;
+  padding: 0 20px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+}
+
+.folio-dock {
+  position: relative;
+  pointer-events: auto;
+  width: 100%;
+  max-width: 960px;
+  border-radius: var(--radius-md);
+  background: var(--vellum-glass);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(174, 123, 36, 0.65);
+  box-shadow: 0 18px 50px rgba(14, 6, 6, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  padding: 18px 26px 16px;
+  transition: transform 0.35s var(--ease-folio);
+}
+
+.folio-dock::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border: 1px solid rgba(116, 21, 32, 0.18);
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+.folio-dock.is-collapsed .folio-collapsible { display: none; }
+.folio-dock.is-collapsed { padding-top: 10px; padding-bottom: 10px; max-width: 440px; }
+
+.folio-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.folio-dock.is-collapsed .folio-head { margin-bottom: 0; }
+
+.folio-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.folio-step-pill {
+  font-family: var(--font-display);
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--crimson-800);
+  background: var(--crimson-100);
+  border: 1px solid rgba(116, 21, 32, 0.24);
+  padding: 3px 9px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+
+.folio-head-controls { display: flex; align-items: center; gap: 6px; }
+
+.btn-mini-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid rgba(174, 123, 36, 0.44);
+  background: rgba(255, 255, 255, 0.74);
+  color: var(--ink-700);
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-family: var(--font-ui);
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-mini-ghost:hover {
+  background: #ffffff;
+  color: var(--crimson-800);
+  border-color: var(--crimson-700);
+}
+
+.btn-mini-ghost svg { width: 14px; height: 14px; }
+
+#description-text {
+  font-family: var(--font-serif);
+  font-size: clamp(1.12rem, 1.55vw, 1.32rem);
+  line-height: 1.54;
+  color: var(--ink-900);
+  margin: 0 0 16px;
+  padding: 0 4px;
+}
+
+#choices-grid {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Besace illustrée */
+.inventory-strip {
+  margin-top: 14px;
+  padding-top: 11px;
+  border-top: 1px dashed rgba(174, 123, 36, 0.44);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.inventory-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--crimson-800);
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.inventory-label svg { width: 15px; height: 15px; }
+
+.inventory-slots {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.inventory-empty {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.98rem;
+  color: var(--ink-500);
+}
+
+.inv-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 11px 4px 5px;
+  background: #fffdf9;
+  border: 1px solid rgba(174, 123, 36, 0.56);
+  border-radius: 999px;
+  color: var(--ink-900);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(30, 21, 18, 0.08);
+  transition: all 0.2s ease;
+}
+
+.inv-chip:hover {
+  border-color: var(--crimson-700);
+  color: var(--crimson-800);
+  transform: translateY(-1px);
+}
+
+.inv-chip img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--gold-500);
+}
+
+/* Modale Découverte d'Artefact */
+.item-showcase-modal {
+  position: relative;
+  width: 100%;
+  max-width: 680px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  box-shadow: var(--shadow-modal);
+  animation: folioAppear 0.38s var(--ease-folio) forwards;
+}
+
+.item-showcase-media {
+  position: relative;
+  background: linear-gradient(155deg, var(--vellum-200) 0%, var(--vellum-300) 100%);
+  border-right: 1px solid rgba(174, 123, 36, 0.45);
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-in;
+}
+
+.item-showcase-media img {
+  width: 100%;
+  max-height: 230px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--gold-500);
+  box-shadow: 0 12px 30px rgba(30, 21, 18, 0.28);
+}
+
+.item-showcase-body {
+  padding: 28px 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.item-showcase-title {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--crimson-800);
+  margin: 8px 0 12px;
+  letter-spacing: 0.05em;
+}
+
+.item-showcase-desc {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  line-height: 1.55;
+  color: var(--ink-700);
+  margin: 0 0 22px;
+}
+
+/* Grimoire des Indices (Journal) */
+.journal-modal {
+  position: relative;
+  width: 100%;
+  max-width: 780px;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-modal);
+  animation: folioAppear 0.32s var(--ease-folio) forwards;
+}
+
+.journal-header {
+  padding: 22px 28px 16px;
+  border-bottom: 1px solid rgba(174, 123, 36, 0.38);
+  background: rgba(236, 222, 192, 0.72);
+}
+
+.journal-header h2 {
+  font-family: var(--font-display);
+  font-size: 1.32rem;
+  color: var(--crimson-800);
+  margin: 4px 0 14px;
+  letter-spacing: 0.08em;
+}
+
+.journal-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.journal-tab {
+  border: 1px solid rgba(174, 123, 36, 0.45);
+  background: rgba(255, 255, 255, 0.68);
+  color: var(--ink-700);
+  padding: 7px 14px;
+  border-radius: 4px;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.journal-tab.is-active {
+  background: var(--crimson-800);
+  color: var(--vellum-50);
+  border-color: var(--gold-500);
+}
+
+.journal-content { padding: 22px 28px 26px; overflow-y: auto; flex: 1; }
+
+.clue-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.clue-card {
+  background: #fffdf9;
+  border: 1px solid rgba(174, 123, 36, 0.45);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 14px rgba(30, 21, 18, 0.08);
+}
+
+.clue-card-img { height: 138px; overflow: hidden; background: var(--vellum-200); cursor: zoom-in; }
+.clue-card-img img { width: 100%; height: 100%; object-fit: cover; }
+.clue-card-body { padding: 12px 14px; }
+.clue-card-body h4 { font-family: var(--font-display); font-size: 0.86rem; color: var(--crimson-800); margin: 0 0 5px; }
+.clue-card-body p { font-family: var(--font-serif); font-size: 0.98rem; line-height: 1.4; color: var(--ink-700); margin: 0; }
+
+.journal-empty {
+  text-align: center;
+  padding: 36px 20px;
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-style: italic;
+  color: var(--ink-500);
+}
+
+.route-timeline { display: grid; gap: 12px; }
+
+.route-zone-card {
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(174, 123, 36, 0.38);
+  background: rgba(255, 253, 248, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.route-zone-card.is-current { border-color: var(--crimson-700); background: #ffffff; box-shadow: 0 4px 16px rgba(116, 21, 32, 0.14); }
+.route-zone-card.is-done { border-color: rgba(29, 100, 72, 0.48); background: rgba(240, 250, 246, 0.86); }
+.route-zone-info h4 { font-family: var(--font-display); font-size: 0.92rem; color: var(--crimson-800); margin: 0 0 3px; }
+.route-zone-info p { font-family: var(--font-serif); font-size: 1rem; color: var(--ink-500); margin: 0; }
+
+.route-status {
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.route-status.done { background: var(--emerald-100); color: var(--emerald-600); }
+.route-status.current { background: var(--crimson-800); color: var(--vellum-50); }
+.route-status.locked { background: rgba(124, 98, 88, 0.12); color: var(--ink-500); }
+
+/* Hall of Fame — Les Évadés */
+.hof-list { list-style: none; padding: 0; margin: 14px 0 0; display: grid; gap: 8px; text-align: left; }
+.hof-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 9px 14px; background: rgba(255, 255, 255, 0.84);
+  border: 1px solid rgba(174, 123, 36, 0.42); border-radius: 4px;
+}
+.hof-item.is-me { border-color: var(--crimson-700); background: var(--crimson-100); }
+.hof-rank { display: inline-flex; align-items: center; gap: 9px; font-family: var(--font-display); font-size: 0.88rem; font-weight: 700; color: var(--crimson-800); }
+.hof-medal {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold-400), var(--gold-600));
+  color: #fff; font-size: 0.72rem; display: inline-flex; align-items: center; justify-content: center;
+}
+.hof-date { font-size: 0.78rem; color: var(--ink-500); }
+
+.folio-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1500;
+  padding: 11px 18px;
+  border-radius: var(--radius-sm);
+  background: var(--crimson-800);
+  color: var(--vellum-50);
+  border: 1.5px solid var(--gold-500);
+  font-size: 0.84rem;
+  box-shadow: 0 12px 30px rgba(14, 6, 6, 0.4);
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition: all 0.28s var(--ease-folio);
+}
+
+.folio-toast.is-shown { opacity: 1; transform: translateY(0); }
+
+@media (max-width: 1040px) { .zone-stepper { display: none; } }
+
+@media (max-width: 720px) {
+  .top-ribbon { margin: 10px 10px 0; padding: 8px 12px; gap: 8px; }
+  .player-chip, .btn-icon .btn-label { display: none; }
+  .folio-dock-wrap { padding: 0 10px 10px; }
+  .folio-dock { padding: 14px 16px 12px; }
+  .item-showcase-modal { grid-template-columns: 1fr; }
+  .item-showcase-media { border-right: none; border-bottom: 1px solid rgba(174, 123, 36, 0.45); padding: 16px; }
+  .item-showcase-body { padding: 20px; }
+  #choices-grid .btn-crimson, #choices-grid .btn-vellum { flex: 1 1 auto; font-size: 0.76rem; padding: 10px 14px; }
+}
