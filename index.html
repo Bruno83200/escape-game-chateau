@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>L'Héritage du Sang — L'Énigme de l'Oubliette</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/auth.css" />
+</head>
+<body class="auth-page">
+  <div class="auth-bg-photo" aria-hidden="true"></div>
+  <div class="auth-bg-wash" aria-hidden="true"></div>
+
+  <div class="auth-stage">
+    <header class="auth-topbar">
+      <div class="auth-coords">
+        <span class="dot"></span>
+        <span>Forteresse de Sang · Les Oubliettes</span>
+      </div>
+      <div class="auth-coords">
+        <span>Chronique Médiévale · 15 Épreuves</span>
+      </div>
+    </header>
+
+    <main class="auth-main">
+      <section class="hero-editorial">
+        <div class="hero-emblem-row">
+          <!-- Écu héraldique & croix de sang -->
+          <svg class="crest-emblem" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.1" aria-hidden="true">
+            <path d="M12 10h40v21c0 14-8.5 22-20 27C20.5 53 12 45 12 31V10Z" fill="rgba(116,21,32,0.34)" />
+            <path d="M32 10v48M12 28h40" stroke-opacity="0.6" />
+            <circle cx="32" cy="28" r="5" fill="currentColor" />
+          </svg>
+          <span class="hero-kicker">Escape Game Médiéval &amp; Alchimique</span>
+        </div>
+
+        <h1 class="hero-title">L'HÉRITAGE<br />DU SANG</h1>
+        <p class="hero-subtitle">L'ÉNIGME DE L'OUBLIETTE</p>
+
+        <p class="hero-lead">
+          « Enchaîné au fond d'une cellule glaciale, seul votre esprit peut briser la malédiction du château.
+          Ouvrez votre grimoire, déjouez les pièges des alchimistes et gravissez la Grande Tour jusqu'au pont-levis de la liberté. »
+        </p>
+
+        <div class="hero-zones-preview" aria-label="Les 4 actes de l'évasion">
+          <span class="zone-pill"><strong>I.</strong> Les Oubliettes</span>
+          <span class="zone-pill"><strong>II.</strong> Appartements Royaux</span>
+          <span class="zone-pill"><strong>III.</strong> Aile des Savants</span>
+          <span class="zone-pill"><strong>IV.</strong> La Grande Tour</span>
+        </div>
+      </section>
+
+      <!-- Grimoire d'Inscription (Connexion obligatoire Firebase) -->
+      <section class="accreditation-card grimoire-surface illuminated-frame" aria-labelledby="form-title">
+        <span class="card-corner tl" aria-hidden="true"></span>
+        <span class="card-corner tr" aria-hidden="true"></span>
+        <span class="card-corner bl" aria-hidden="true"></span>
+        <span class="card-corner br" aria-hidden="true"></span>
+
+        <div class="card-stamp-header">
+          <div class="folio-tag">Registre du Donjon · Sceau Pourpre</div>
+          <h2 id="form-title">CRÉER UN COMPTE</h2>
+          <p id="form-subtitle">Inscrivez votre nom au grimoire pour sauvegarder votre évasion</p>
+        </div>
+
+        <div class="auth-tabs" role="tablist">
+          <button type="button" class="auth-tab is-active" id="tab-register" role="tab" aria-selected="true">
+            Nouveau Prisonnier
+          </button>
+          <button type="button" class="auth-tab" id="tab-login" role="tab" aria-selected="false">
+            Déjà Inscrit
+          </button>
+        </div>
+
+        <form id="auth-form" novalidate>
+          <div id="group-pseudo" class="field-group">
+            <label for="pseudo">
+              <span>Pseudo de jeu</span>
+              <span class="field-hint">Inscrit sur la Liste des Évadés</span>
+            </label>
+            <div class="input-wrap">
+              <input type="text" id="pseudo" class="field-input" placeholder="Ex : ChevalierNoir" autocomplete="nickname" />
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="email">
+              <span>Adresse Mail</span>
+              <span class="field-hint">Compte personnel</span>
+            </label>
+            <div class="input-wrap">
+              <input type="email" id="email" class="field-input" placeholder="votre@email.com" autocomplete="email" required />
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="password">
+              <span>Mot de passe</span>
+              <span class="field-hint">6 caractères minimum</span>
+            </label>
+            <div class="input-wrap">
+              <input type="password" id="password" class="field-input has-toggle" placeholder="••••••••" autocomplete="current-password" required />
+              <button type="button" class="password-toggle" id="toggle-password" aria-label="Afficher ou masquer le mot de passe">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18">
+                  <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div id="auth-feedback" class="auth-feedback" role="alert"></div>
+
+          <button type="submit" class="btn-crimson submit-btn-full" id="submit-auth">
+            <span>Commencer l'Aventure</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M13 5l7 7-7 7" />
+            </svg>
+          </button>
+
+          <div class="forgot-link-wrap" id="forgot-wrap" style="display:none;">
+            <button type="button" class="btn-forgot" id="forgot-password">Mot de passe oublié ?</button>
+          </div>
+        </form>
+
+        <div class="auth-footer-note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+          </svg>
+          <span>Sauvegarde synchronisée · Accès sécurisé par compte</span>
+        </div>
+      </section>
+    </main>
+
+    <footer class="auth-bottombar">
+      <div class="auth-credits">© 2026 — Imaginé et créé par Bruno CULOT</div>
+      <div class="auth-badge-photo">Grimoire Enluminé · 31 Salles &amp; 15 Épreuves</div>
+    </footer>
+  </div>
+
+  <!-- Modale Grimoire d'accueil -->
+  <div id="custom-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-title-text">
+    <div class="grimoire-modal grimoire-surface illuminated-frame">
+      <div class="modal-header-tag">
+        <span id="modal-kicker" class="folio-tag">Sceau du Donjon</span>
+      </div>
+      <h3 class="modal-title" id="modal-title-text">Grimoire d'Évasion</h3>
+      <div class="modal-body-row stacked">
+        <div id="modal-thumb-wrap" class="modal-thumb-wrap" style="display:none;">
+          <img id="modal-illustration" src="" alt="Enluminure" />
+        </div>
+        <div id="modal-text" class="modal-prose"></div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" id="modal-btn" class="btn-crimson">Continuer</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>L'Héritage du Sang — Exploration du Donjon</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/game.css" />
+  <link rel="stylesheet" href="css/minigames.css" />
+</head>
+<body class="game-page">
+  <div id="scene-stage">
+    <div id="scene-layer-a" class="scene-layer is-visible" aria-hidden="true"></div>
+    <div id="scene-layer-b" class="scene-layer" aria-hidden="true"></div>
+    <div class="scene-vignette" aria-hidden="true"></div>
+    <div class="scene-draft-frame" aria-hidden="true"></div>
+
+    <!-- RUBAN SUPÉRIEUR ENLUMINÉ -->
+    <header class="top-ribbon">
+      <div class="ribbon-left">
+        <div class="ribbon-seal" aria-hidden="true">
+          <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3">
+            <path d="M14 12h36v18c0 12-7.5 19-18 23-10.5-4-18-11-18-23V12Z" />
+            <path d="M32 12v41M14 27h36" stroke-opacity="0.7" />
+          </svg>
+        </div>
+        <div class="ribbon-location">
+          <div id="zone-label" class="ribbon-zone-label">Acte I · Les Oubliettes</div>
+          <div id="scene-title" class="ribbon-scene-title">La Cellule Glaciale</div>
+        </div>
+      </div>
+
+      <nav id="zone-stepper" class="zone-stepper" aria-label="Progression des 4 actes"></nav>
+
+      <div class="ribbon-actions">
+        <div class="player-chip" title="Prisonnier en fuite">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" width="15" height="15">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M5 20a7 7 0 0 1 14 0" />
+          </svg>
+          <span id="player-name">Aventurier</span>
+        </div>
+
+        <button type="button" class="btn-icon btn-journal" id="btn-journal" title="Ouvrir le Grimoire d'Évasion">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+          </svg>
+          <span class="btn-label">Grimoire</span>
+          <span id="journal-badge" class="journal-badge">0</span>
+        </button>
+
+        <button type="button" class="btn-icon btn-audio" id="btn-audio" title="Activer ou couper le son">
+          <svg id="icon-audio-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+            <path d="M15.5 8.5a5 5 0 0 1 0 7" />
+            <path d="M19 5a10 10 0 0 1 0 14" />
+          </svg>
+          <svg id="icon-audio-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" style="display:none;">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+            <line x1="23" y1="9" x2="17" y2="15" />
+            <line x1="17" y1="9" x2="23" y2="15" />
+          </svg>
+          <span class="btn-label">Son</span>
+        </button>
+
+        <button type="button" class="btn-icon" id="btn-logout" title="Quitter le donjon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          <span class="btn-label">Quitter</span>
+        </button>
+      </div>
+    </header>
+
+    <div id="zone-announcement" class="zone-announcement" aria-live="polite">
+      <div id="zone-announcement-kicker" class="zone-announcement-kicker">ACTE I</div>
+      <div id="zone-announcement-title" class="zone-announcement-title">Les Oubliettes</div>
+    </div>
+
+    <!-- FOLIO PARCHEMIN FLOTTANT -->
+    <section class="folio-dock-wrap" aria-label="Chronique du donjon">
+      <div id="folio-dock" class="folio-dock grimoire-surface">
+        <div class="folio-head">
+          <div class="folio-meta">
+            <span id="folio-step-pill" class="folio-step-pill">Folio 01</span>
+            <span id="folio-subtitle" class="folio-tag">La Cellule Glaciale</span>
+          </div>
+
+          <div class="folio-head-controls">
+            <button type="button" class="btn-mini-ghost" id="btn-scene-hint" style="display:none;" title="Consulter une marge enluminée du grimoire">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
+              <span>Indice</span>
+            </button>
+            <button type="button" class="btn-mini-ghost" id="btn-collapse-folio" title="Réduire pour admirer la salle">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+              <span id="collapse-label">Vue décor</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="folio-collapsible">
+          <p id="description-text">L'obscurité vous enveloppe…</p>
+
+          <div id="choices-grid"></div>
+
+          <div class="inventory-strip">
+            <div class="inventory-label">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <path d="M16 10a4 4 0 0 1-8 0" />
+              </svg>
+              <span>Besace</span>
+            </div>
+            <div id="inventory-slots" class="inventory-slots">
+              <span class="inventory-empty">Votre besace est vide</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- MODALE GRIMOIRE -->
+  <div id="custom-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-title-text">
+    <div class="grimoire-modal grimoire-surface illuminated-frame">
+      <div class="modal-header-tag">
+        <span id="modal-kicker" class="folio-tag">Parchemin Scellé</span>
+      </div>
+      <h3 class="modal-title" id="modal-title-text">L'Héritage du Sang</h3>
+      <div id="modal-body-row" class="modal-body-row">
+        <div id="modal-thumb-wrap" class="modal-thumb-wrap" style="display:none;" title="Cliquer pour examiner à la loupe">
+          <img id="modal-illustration" src="" alt="Enluminure" />
+          <span class="modal-thumb-zoom">🔍 Loupe</span>
+        </div>
+        <div id="modal-text" class="modal-prose"></div>
+      </div>
+      <div id="modal-extra"></div>
+      <div class="modal-actions">
+        <button type="button" id="modal-btn" class="btn-crimson">Continuer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODALE ARTEFACT TROUVÉ -->
+  <div id="item-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="item-modal-title">
+    <div class="item-showcase-modal grimoire-surface illuminated-frame">
+      <div id="item-modal-media" class="item-showcase-media" title="Cliquer pour examiner en détail">
+        <img id="item-modal-img" src="" alt="Objet trouvé" />
+      </div>
+      <div class="item-showcase-body">
+        <span class="folio-tag">Placé dans votre Besace</span>
+        <h2 id="item-modal-title" class="item-showcase-title">Objet trouvé</h2>
+        <p id="item-modal-text" class="item-showcase-desc"></p>
+        <div>
+          <button type="button" id="item-modal-btn" class="btn-crimson">Poursuivre</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODALE ATELIER INTERACTIF -->
+  <div id="workbench-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="workbench-title">
+    <div class="workbench-modal grimoire-surface illuminated-frame">
+      <button type="button" class="modal-close-x" id="workbench-close" aria-label="Fermer l'atelier">×</button>
+      <div class="workbench-header">
+        <div class="workbench-title-group">
+          <span id="workbench-kicker" class="folio-tag">Mécanisme du Château</span>
+          <h2 id="workbench-title">Épreuve du Donjon</h2>
+        </div>
+        <button type="button" class="btn-mini-ghost" id="workbench-hint-btn" style="display:none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+          <span>Coup de pouce</span>
+        </button>
+      </div>
+      <div class="workbench-body">
+        <p id="workbench-instruction" class="workbench-instruction"></p>
+        <div id="workbench-stage"></div>
+        <div id="workbench-hint-box" class="workbench-hint-box"></div>
+        <div id="workbench-status" class="workbench-status" role="status"></div>
+      </div>
+      <div id="workbench-footer" class="workbench-footer"></div>
+    </div>
+  </div>
+
+  <!-- MODALE GRIMOIRE DES INDICES -->
+  <div id="journal-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="journal-heading">
+    <div class="journal-modal grimoire-surface illuminated-frame">
+      <button type="button" class="modal-close-x" id="journal-close" aria-label="Fermer le grimoire">×</button>
+      <div class="journal-header">
+        <span class="folio-tag">Chronique de l'Évasion · Sceau Pourpre</span>
+        <h2 id="journal-heading">Grimoire Enluminé</h2>
+        <div class="journal-tabs" role="tablist">
+          <button type="button" class="journal-tab is-active" data-jtab="clues">Enluminures &amp; Indices</button>
+          <button type="button" class="journal-tab" data-jtab="route">Plan du Château</button>
+          <button type="button" class="journal-tab" data-jtab="bag">Besace</button>
+        </div>
+      </div>
+      <div id="journal-content" class="journal-content"></div>
+    </div>
+  </div>
+
+  <!-- VISIONNEUSE LOUPE PLEIN ÉCRAN -->
+  <div id="lightbox-modal" class="lightbox-backdrop" role="dialog" aria-modal="true" aria-label="Loupe d'archive">
+    <div class="lightbox-frame">
+      <img id="lightbox-img" src="" alt="Aperçu agrandi" />
+    </div>
+    <div id="lightbox-caption" class="lightbox-caption"></div>
+    <div class="lightbox-toolbar">
+      <button type="button" class="btn-vellum" id="lightbox-zoom-toggle">Agrandir / Ajuster</button>
+      <button type="button" class="btn-crimson" id="lightbox-close">Fermer la loupe</button>
+    </div>
+  </div>
+
+  <div id="folio-toast" class="folio-toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="js/engine/scenes-engine.js"></script>
+</body>
+</html>
